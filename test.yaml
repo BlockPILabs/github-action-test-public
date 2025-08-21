@@ -1,5 +1,0 @@
-name: test
-value: 123
-nested:
-  key: value
-  number: 456
