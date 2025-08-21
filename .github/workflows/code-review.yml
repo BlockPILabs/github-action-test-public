@@ -1,4 +1,4 @@
-name: Code Review
+name: 代码格式验证
 
 on:
   push:
