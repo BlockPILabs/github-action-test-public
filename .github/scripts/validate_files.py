@@ -54,6 +54,7 @@ def main():
     parser.add_argument('--directory', '-d', default='.', help='Directory to scan for files')
     parser.add_argument('--check-json', action='store_true', help='Check JSON files')
     parser.add_argument('--check-yaml', action='store_true', help='Check YAML files')
+    parser.add_argument('--changed-files', nargs='*', help='List of changed files to validate')
     
     args = parser.parse_args()
     
@@ -62,17 +63,26 @@ def main():
     
     all_valid = True
     
-    if args.check_json:
-        json_files = find_files(args.directory, '.json')
-        print(f"Found {len(json_files)} JSON files")
+    # If changed files are provided, filter them by extension
+    if args.changed_files:
+        json_files = [f for f in args.changed_files if f.endswith('.json')]
+        yaml_files = [f for f in args.changed_files if f.endswith('.yaml') or f.endswith('.yml')]
+    else:
+        # Otherwise, find all files in directory
+        json_files = find_files(args.directory, '.json') if args.check_json else []
+        yaml_files = []
+        if args.check_yaml:
+            yaml_files = find_files(args.directory, '.yaml')
+            yaml_files += find_files(args.directory, '.yml')
+    
+    if args.check_json and json_files:
+        print(f"Found {len(json_files)} JSON files to validate")
         for file_path in json_files:
             if not validate_json(file_path):
                 all_valid = False
     
-    if args.check_yaml:
-        yaml_files = find_files(args.directory, '.yaml')
-        yaml_files += find_files(args.directory, '.yml')
-        print(f"Found {len(yaml_files)} YAML files")
+    if args.check_yaml and yaml_files:
+        print(f"Found {len(yaml_files)} YAML files to validate")
         for file_path in yaml_files:
             if not validate_yaml(file_path):
                 all_valid = False

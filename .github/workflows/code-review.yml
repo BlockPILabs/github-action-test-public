@@ -13,6 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.json
+            **/*.yaml
+            **/*.yml
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -25,4 +34,9 @@ jobs:
 
       - name: Validate JSON and YAML files
         run: |
-          python .github/scripts/validate_files.py --directory . --check-json --check-yaml
+          if [ "${{ steps.changed-files.outputs.any_changed }}" = "true" ]; then
+            echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+            python .github/scripts/validate_files.py --changed-files ${{ steps.changed-files.outputs.all_changed_files }} --check-json --check-yaml
+          else
+            echo "No JSON or YAML files changed"
+          fi
