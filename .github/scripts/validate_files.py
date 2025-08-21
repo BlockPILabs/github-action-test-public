@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-import ruamel.yaml as yaml
+import yaml
 import sys
 import os
 import argparse
